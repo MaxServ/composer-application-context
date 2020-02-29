@@ -1,0 +1,6 @@
+*
+!/.gitignore
+!/composer.json
+!/README.md
+!/src
+!/src/*

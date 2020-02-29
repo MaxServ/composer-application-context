@@ -1,0 +1,26 @@
+{
+  "name": "maxserv/composer-application-context",
+  "type": "composer-plugin",
+  "require": {
+    "composer-plugin-api": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "MaxServ\\ComposerApplicationContext\\": "src/"
+    }
+  },
+  "require-dev": {
+    "composer/composer": "^1"
+  },
+  "extra": {
+    "class": "MaxServ\\ComposerApplicationContext\\Plugin",
+    "application-context": {
+      "paths": [
+        "index.php"
+      ],
+      "variables": {
+        "APPLICATION_CONTEXT": "%env(APPLICATION_CONTEXT)%"
+      }
+    }
+  }
+}
