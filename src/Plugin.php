@@ -63,18 +63,33 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
     protected function prefixSourceFiles(array $paths, string $snippet)
     {
+        $boundary = '// --- ' . md5(self::class) . ' ---';
+
+        $snippet = $boundary . PHP_EOL . $snippet . PHP_EOL . $boundary;
+
         $this->io->write(
-            'Prefixing source files with: ' . PHP_EOL .
-            ' --- ' . PHP_EOL .  $snippet . PHP_EOL . ' --- '
+            'Prefixing source files with: ' . PHP_EOL . $snippet
         );
 
         array_walk(
             $paths,
-            function (string $path) use ($snippet) {
+            function (string $path) use ($boundary, $snippet) {
                 $contents = null;
 
                 if(is_file($path)) {
                     $contents = file_get_contents($path);
+                }
+
+                if ($contents !== null && $contents !== false && strpos($contents, $boundary) !== false) {
+                    $contents = preg_replace(
+                        '/' .
+                            addcslashes(preg_quote($boundary), '/') .
+                            '(.*)' .
+                            addcslashes(preg_quote($boundary), '/') . '\s*' .
+                        '/ms',
+                        '',
+                        $contents
+                    );
                 }
 
                 if ($contents !== null && $contents !== false) {
