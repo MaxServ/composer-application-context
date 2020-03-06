@@ -6,6 +6,7 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Package\Package;
 use Composer\Plugin\PluginInterface;
+use Composer\Script\ScriptEvents;
 
 
 class Plugin implements PluginInterface, EventSubscriberInterface
@@ -35,9 +36,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'post-autoload-dump' => [
+            ScriptEvents::POST_AUTOLOAD_DUMP => [
                 ['onPostAutoloadDump', -21]
             ],
+            ScriptEvents::POST_INSTALL_CMD => [
+                ['onPostAutoloadDump', -21]
+            ],
+            ScriptEvents::POST_UPDATE_CMD => [
+                ['onPostAutoloadDump', -21]
+            ]
         ];
     }
 
@@ -67,10 +74,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         $snippet = $boundary . PHP_EOL . $snippet . PHP_EOL . $boundary;
 
-        $this->io->write(
-            'Prefixing source files with: ' . PHP_EOL . $snippet
-        );
-
         array_walk(
             $paths,
             function (string $path) use ($boundary, $snippet) {
@@ -98,10 +101,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                         '<?php' . PHP_EOL . $snippet . PHP_EOL,
                         $contents
                     );
-
-                    if (file_put_contents($path, $contents) !== false) {
-                        $this->io->write('Patched "' . $path . '" with getenv/putenv"');
-                    }
                 }
             }
         );
